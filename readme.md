@@ -57,8 +57,6 @@ TalkToMyCV is a **FastAPI-based backend** that processes PDF CVs uploaded by use
 - **Retrieval-Augmented Generation (RAG)**:
   - **LangChain** for the seamless integration of document retrieval and generative models.
   - **FAISS** for efficient similarity-based document retrieval.
-- **Database** (Optional for Future Use):
-  - **SQLite** for lightweight local storage of processed CV data (planned for future features).
 - **Deployment Tools**:
   - **Docker** for containerization and easy deployment across various platforms.
   - **Poetry** for Python dependency management.
@@ -78,6 +76,44 @@ TalkToMyCV is a **FastAPI-based backend** that processes PDF CVs uploaded by use
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/rahuldatta/talktomycv.git
-   cd talktomycv
+   - git clone https://github.com/rahuldatta/talktomycv.git
+   - cd talktomycv
+   - poetry install
+   - poetry add langchain faiss-cpu
+   - uvicorn app.main:app --reload
    ```
+
+## 📑 API Endpoints
+
+### **`POST /upload-pdf/`**
+
+- **Method**: `POST`
+- **Description**: Upload a PDF CV for processing. The PDF will be extracted and stored for future query processing.
+
+#### Request Body:
+
+```json
+{
+  "file": "PDF file (multipart/form-data)"
+}
+```
+
+### **`POST /ask-question/`**
+
+- **Method**: `POST`
+- **Description**: Ask a question based on the uploaded PDF. The system will retrieve relevant content from the PDF and generate an answer.
+
+#### Request Body:
+
+```json
+{
+  "question": "What is the candidate's experience?"
+}
+
+
+{
+  "answer": "The candidate has 5 years of experience in software development, specializing in web applications."
+}
+```
+
+This will render the request body and response in a clean and readable format when viewed in Markdown-supported environments.
