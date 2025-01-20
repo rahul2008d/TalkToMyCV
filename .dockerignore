@@ -1,0 +1,7 @@
+*.pyc
+__pycache__
+*.pyo
+*.pyd
+.env
+poetry.lock
+*.git
