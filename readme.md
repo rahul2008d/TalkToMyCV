@@ -1,78 +1,67 @@
-# TalkToMyCV
+# TalkToMyCV - FastAPI Backend with RAG
 
 **Copyright (c) Rahul Datta**
 
-A modern **Full Stack Web Application** to streamline the process of managing CVs, offering a sleek and interactive user interface for both job seekers and recruiters.
+A powerful **API service** designed to process and analyze CVs (in PDF format) and provide intelligent responses to user queries. This API utilizes **Retrieval-Augmented Generation (RAG)** with **LangChain** and **FAISS** for efficient document retrieval and intelligent question answering.
 
 ---
 
 ## 🚀 **Project Overview**
 
-TalkToMyCV is a production-grade web application designed to offer a seamless and engaging experience for users to upload, manage, and showcase their CVs. Built using **React**, **Next.js**, and **FastAPI** (with Docker support), this app provides robust features and a responsive interface for job seekers to interact with recruiters.
+TalkToMyCV is a **FastAPI-based backend** that processes PDF CVs uploaded by users and allows them to ask questions regarding the information in the CVs. The application leverages **RAG** to provide accurate and context-aware responses by first retrieving relevant information from the CV and then generating an answer based on the context.
 
-- **Frontend**: React, Next.js, Tailwind CSS
-- **Backend**: FastAPI
-- **Database**: SQLite (with PostgreSQL support for future scalability)
-- **Deployment**: Docker, CI/CD, and Cloud Integration (e.g., AWS, Google Cloud)
+- **Backend**: FastAPI (with Uvicorn)
+- **Purpose**: Process CVs (PDFs), extract data, and answer questions with advanced retrieval and generation techniques.
+- **Tech**: LangChain for RAG, FAISS for efficient document retrieval
+- **Deployment**: Dockerized for easy cloud integration
 
 ---
 
 ## 🧑‍💻 **Key Features**
 
-### 1. **User Authentication and Authorization**
+### 1. **PDF Upload & Processing**
 
-- Secure login and registration with **OAuth2** and **JWT tokens**.
-- User roles: Job Seekers, Recruiters.
+- API endpoint to upload CVs in **PDF format**.
+- Extract text and relevant information from the uploaded CV.
 
-### 2. **CV Upload & Management**
+### 2. **Retrieval-Augmented Generation (RAG)**
 
-- Users can upload, update, and display their CVs in multiple formats.
-- Dynamic CV previews with real-time updates.
+- **LangChain** is used to combine document retrieval with generative AI models for answering questions.
+- **FAISS** is used for efficient **vector-based** similarity search, ensuring fast retrieval of relevant content from the CVs.
 
-### 3. **Job Search and Filtering**
+### 3. **Question Answering System**
 
-- Recruiters can post job listings.
-- Job seekers can filter job listings by position, location, and skills.
+- Ability to ask questions about the CV’s content.
+- Intelligent response generation using a combination of **retrieval** and **generation** techniques, ensuring context-aware answers.
 
-### 4. **Interactive Dashboards**
+### 4. **Scalable and Extensible**
 
-- **Recruiter Dashboard**: Manage candidates, view applications, and analyze candidate profiles.
-- **Job Seeker Dashboard**: Track job applications, profile updates, and see recommendations.
+- The API is designed to scale easily and integrate with other services and frontend projects.
+- Future enhancements could include integrating **Machine Learning** models for more advanced processing.
 
-### 5. **Mobile-First Design**
+### 5. **Dockerized for Deployment**
 
-- Fully responsive design optimized for mobile, tablet, and desktop screens using **Tailwind CSS**.
-
-### 6. **Dockerized Deployment**
-
-- Docker support for easy setup and scalability across different environments.
-- Ready for cloud deployment with minimal configuration.
+- The project is fully Dockerized, making it ready for cloud deployment with minimal configuration.
 
 ---
 
 ## 🔧 **Tech Stack**
 
-- **Frontend**:
-  - **React** for dynamic rendering and state management.
-  - **Next.js** for SSR (Server-Side Rendering) and API routes.
-  - **Tailwind CSS** for a responsive, customizable UI.
 - **Backend**:
-  - **FastAPI** for high-performance REST API development.
-  - **Uvicorn** for serving the FastAPI app.
-- **Development Tools**:
-  - **Docker** for containerized environments.
+  - **FastAPI** for efficient handling of requests and fast responses.
+  - **Uvicorn** for serving the FastAPI app in a production-ready environment.
+- **Document Processing**:
+
+  - Utilizes libraries like **PyMuPDF** for PDF text extraction.
+
+- **Retrieval-Augmented Generation (RAG)**:
+  - **LangChain** for the seamless integration of document retrieval and generative models.
+  - **FAISS** for efficient similarity-based document retrieval.
+- **Database** (Optional for Future Use):
+  - **SQLite** for lightweight local storage of processed CV data (planned for future features).
+- **Deployment Tools**:
+  - **Docker** for containerization and easy deployment across various platforms.
   - **Poetry** for Python dependency management.
-  - **GitHub Actions** for CI/CD pipeline automation.
-
----
-
-## 🌐 **Project Features**
-
-- **Fast API** server for handling asynchronous requests efficiently.
-- **React & Next.js** integrated for an intuitive user interface.
-- Dockerized for deployment in cloud environments like AWS or Google Cloud.
-- Real-time updates for job applications and CV management.
-- **Scalable architecture** designed for growth.
 
 ---
 
@@ -81,8 +70,8 @@ TalkToMyCV is a production-grade web application designed to offer a seamless an
 ### Prerequisites
 
 - Python 3.8+
-- Node.js 14+
-- Docker (optional but recommended for deployment)
+- Docker (for containerized deployment)
+- FAISS and LangChain libraries
 
 ### Steps to Run Locally
 
