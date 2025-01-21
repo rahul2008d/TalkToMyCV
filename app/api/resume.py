@@ -1,4 +1,4 @@
-from fastapi import APIRouter, File, UploadFile, HTTPException
+from fastapi import APIRouter, File, Body, UploadFile, HTTPException
 from app.services.vectorize import vectorize_and_store_pdf
 from app.services.search import search_query
 import shutil
@@ -50,7 +50,7 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 # Route to submit query and get response from the indexed data
 @router.post("/ask_question")
-async def ask_question(query: str):
+async def ask_question(query: str = Body(...)):
     try:
         # Perform search based on the query
         response = search_query(query)
