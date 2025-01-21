@@ -1,10 +1,8 @@
-import PyPDF2
+from langchain_community.document_loaders import PyPDFLoader, PyMuPDFLoader
 
 
 def extract_text_from_pdf(file_path: str) -> str:
-    with open(file_path, "rb") as f:
-        reader = PyPDF2.PdfReader(f)
-        text = ""
-        for page in reader.pages:
-            text += page.extract_text()
-    return text
+    # loader = PyPDFLoader("example_data/layout-parser-paper.pdf")
+    loader = PyMuPDFLoader(file_path)
+    pages = loader.load_and_split()
+    return pages

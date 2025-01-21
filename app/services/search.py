@@ -1,58 +1,63 @@
 from langchain.chains import ConversationalRetrievalChain
-from langchain_community.chat_models import ChatOpenAI
-from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_openai import ChatOpenAI
+from langchain_openai import OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
+from langchain.schema.runnable import RunnablePassthrough
+from langchain.prompts import ChatPromptTemplate
+from langchain.schema.output_parser import StrOutputParser
 from dotenv import load_dotenv
+from functools import lru_cache
 import os
 
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+# Constants
+INDEX_PATH = "vector_store/faiss_index"
+ANSWER_PROMPT_TEMPLATE = """
+You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. 
+If you don't know the answer, just say that you don't know. Be as verbose and educational in your response as possible. 
 
-def search_query(query: str, index_path: str = "vector_store/faiss_index") -> str:
-    # Initialize OpenAI embeddings
+Context: {context}
+Question: "{question}"
+Answer:
+"""
+
+
+# Initialize OpenAI Embeddings and Chat Model
+def initialize_resources():
     embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
-
-    # Load FAISS vector store
-    vector_store = FAISS.load_local(index_path, embeddings)
-
-    # # Perform search query
-    # results = vector_store.similarity_search(
-    #     query, k=1
-    # )  # Adjust k as needed for number of results
-    # return results[0].page_content if results else "No relevant results found."
-    # Initialize OpenAI chat model for answering queries
+    vector_store = FAISS.load_local(
+        INDEX_PATH, embeddings, allow_dangerous_deserialization=True
+    )
     chat_model = ChatOpenAI(openai_api_key=OPENAI_API_KEY, temperature=0)
+    return embeddings, vector_store, chat_model
 
-    # Create the ConversationalRetrievalChain with the vector store and chat model
-    qa_chain = ConversationalRetrievalChain.from_llm(
-        chat_model, vector_store.as_retriever()
+
+# Cache for Reusable Resources
+@lru_cache(maxsize=1)
+def get_qa_chain():
+    _, vector_store, chat_model = initialize_resources()
+
+    answer_prompt = ChatPromptTemplate.from_template(ANSWER_PROMPT_TEMPLATE)
+
+    qa_chain = (
+        {"context": vector_store.as_retriever(), "question": RunnablePassthrough()}
+        | answer_prompt
+        | chat_model
+        | StrOutputParser()
     )
 
-    # Retrieve relevant document from the vector store
-    results = vector_store.similarity_search(
-        query, k=1
-    )  # Adjust k as needed for the number of documents to retrieve
+    return qa_chain
 
-    if not results:
-        return "No relevant results found."
 
-    # Extract the document content from the retrieved results
-    retrieved_document_content = results[0].page_content
+# Function to Handle User Query
+def search_query(query: str) -> str:
+    # Retrieve QA Chain
+    qa_chain = get_qa_chain()
 
-    # Construct the prompt
-    prompt = f"""
-    You are a helpful assistant that is specialized in interpreting resume content. Given the context below, answer the user's question as precisely and concisely as possible.
+    # Get Response from QA Chain
+    response = qa_chain.invoke(query)
 
-    Context: {retrieved_document_content}
-
-    User's Question: {query}
-
-    Answer:
-    """
-
-    # Get the response from the QA chain using the generated prompt
-    response = chat_model.chat([{"role": "system", "content": prompt}])
-
-    # Return the final answer from the response
-    return response["choices"][0]["message"]["content"].strip()
+    # Return Final Answer
+    return response

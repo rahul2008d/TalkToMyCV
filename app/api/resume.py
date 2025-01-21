@@ -2,6 +2,7 @@ from fastapi import APIRouter, File, UploadFile, HTTPException
 from app.services.vectorize import vectorize_and_store_pdf
 from app.services.search import search_query
 import shutil
+import os
 
 router = APIRouter()
 
@@ -19,11 +20,23 @@ async def health_check():
 # Route to upload PDF, vectorize and store it
 @router.post("/upload_pdf")
 async def upload_pdf(file: UploadFile = File(...)):
+
     try:
+        # Path for saving the uploaded file
+        uploads_directory = "uploads"
+
+        # Check if the "uploads" folder exists, if not, create it
+        if not os.path.exists(uploads_directory):
+            os.makedirs(uploads_directory)
+
         # Save the uploaded file
-        file_location = f"uploads/{file.filename}"
-        with open(file_location, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+        file_location = os.path.join(uploads_directory, file.filename)
+
+        try:
+            with open(file_location, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error saving file: {str(e)}")
 
         # Vectorize the PDF and store it
         vectorize_and_store_pdf(file_location)
