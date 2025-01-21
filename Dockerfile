@@ -1,23 +1,26 @@
-# Use the official Python image from Docker Hub
-FROM python:3.11-slim
+# Use the official AWS Lambda Python runtime as a base image
+FROM public.ecr.aws/lambda/python:3.10
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the poetry lock files and pyproject.toml first (for caching purposes)
+# Install Poetry (for dependency management)
+RUN pip install --no-cache-dir poetry
+
+# Copy the Poetry configuration and other necessary files into the container
 COPY pyproject.toml poetry.lock* /app/
 
-# Install Poetry (Python package manager)
-RUN pip install poetry
+# Install dependencies with Poetry
+RUN poetry install --no-dev --no-root
 
-# Install dependencies in the container using Poetry
-RUN poetry install --no-root --only main
+# Copy the application code into the container
+COPY . /app/
 
-# Copy the rest of the application into the container
-COPY . /app
+# Set the environment variable for the Lambda handler (FastAPI app)
+ENV AWS_LAMBDA_FUNCTION_HANDLER="app.lambda_handler"
 
-# Expose the port that FastAPI will run on
-EXPOSE 8000
+# Expose port 8080 for local testing
+EXPOSE 8080
 
-# Run the FastAPI app using Uvicorn
-CMD ["poetry", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use the Lambda runtime to run the FastAPI app when the container starts
+CMD ["app.lambda_handler"]
