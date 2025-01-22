@@ -13,7 +13,6 @@ load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Constants
-INDEX_PATH = "vector_store/faiss_index"
 ANSWER_PROMPT_TEMPLATE = """
 You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. 
 If you don't know the answer, just say that you don't know. Be as verbose and educational in your response as possible. 
@@ -25,10 +24,10 @@ Answer:
 
 
 # Initialize OpenAI Embeddings and Chat Model
-def initialize_resources():
+def initialize_resources(index_path: str):
     embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
     vector_store = FAISS.load_local(
-        INDEX_PATH, embeddings, allow_dangerous_deserialization=True
+        index_path, embeddings, allow_dangerous_deserialization=True
     )
     chat_model = ChatOpenAI(openai_api_key=OPENAI_API_KEY, temperature=0)
     return embeddings, vector_store, chat_model
@@ -36,8 +35,8 @@ def initialize_resources():
 
 # Cache for Reusable Resources
 @lru_cache(maxsize=1)
-def get_qa_chain():
-    _, vector_store, chat_model = initialize_resources()
+def get_qa_chain(index_path: str):
+    _, vector_store, chat_model = initialize_resources(index_path)
 
     answer_prompt = ChatPromptTemplate.from_template(ANSWER_PROMPT_TEMPLATE)
 
@@ -52,9 +51,9 @@ def get_qa_chain():
 
 
 # Function to Handle User Query
-def search_query(query: str) -> str:
+def search_query(query: str, index_path: str) -> str:
     # Retrieve QA Chain
-    qa_chain = get_qa_chain()
+    qa_chain = get_qa_chain(index_path)
 
     # Get Response from QA Chain
     response = qa_chain.invoke(query)
