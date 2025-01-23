@@ -23,8 +23,8 @@ async def health_check():
 async def upload_pdf(request: Request, file: UploadFile = File(...)):
 
     user_id = request.state.user_id  # Retrieve user_id
-    uploads_directory = f"uploads/{user_id}"
-    index_directory = f"vector_store/{user_id}"
+    uploads_directory = f"tmp/uploads/{user_id}"
+    index_directory = f"tmp/vector_store/{user_id}"
 
     try:
         os.makedirs(uploads_directory, exist_ok=True)
@@ -52,10 +52,9 @@ async def upload_pdf(request: Request, file: UploadFile = File(...)):
 async def ask_question(request: Request, query: str = Body(...)):
     try:
         user_id = request.state.user_id  # Retrieve user_id
-        user_index_path = f"vector_store/{user_id}"
+        user_index_path = f"tmp/vector_store/{user_id}"
         default_index_path = "vector_store/default"
 
-        # Determine which index to use
         if os.path.exists(user_index_path):
             index_path = user_index_path
             using_default = False
