@@ -76,7 +76,7 @@ async def ask_question(request: Request, query: str = Body(...)):
             "answer": response,
             "source": "default" if using_default else "user",
             "message": (
-                "Answered from default knowledge base."
+                "This answer is derived from Rahul's professional expertise (since no document was uploaded)."
                 if using_default
                 else "Answered from your uploaded data."
             ),
