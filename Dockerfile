@@ -1,26 +1,25 @@
-# Use the official AWS Lambda Python runtime as a base image
+# Use an official Python runtime as the base image
 FROM public.ecr.aws/lambda/python:3.10
 
-# Set the working directory inside the container
-WORKDIR /app
+# Set environment variables for Python and prevent buffering
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 
 
-# Install Poetry (for dependency management)
-RUN pip install --no-cache-dir poetry
+# Create an app directory
+WORKDIR /var/task
 
-# Copy the Poetry configuration and other necessary files into the container
-COPY pyproject.toml poetry.lock* /app/
+# Copy pyproject.toml to install dependencies
+COPY pyproject.toml /var/task/
 
-# Install dependencies with Poetry
-RUN poetry install --no-dev --no-root
+# Install Poetry for dependency management
+RUN curl -sSL https://install.python-poetry.org | python3 - && \
+    export PATH="/root/.local/bin:$PATH" && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-dev --no-interaction --no-ansi
 
-# Copy the application code into the container
-COPY . /app/
+# Copy the application code to the container
+COPY app/ /var/task/app/
+COPY vector_store/ /var/task/vector_store/
 
-# Set the environment variable for the Lambda handler (FastAPI app)
-ENV AWS_LAMBDA_FUNCTION_HANDLER="app.lambda_handler"
-
-# Expose port 8080 for local testing
-EXPOSE 8080
-
-# Use the Lambda runtime to run the FastAPI app when the container starts
-CMD ["app.lambda_handler"]
+# Add Lambda handler
+CMD ["app.main.handler"]
