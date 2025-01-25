@@ -4,5 +4,6 @@ __pycache__/
 *.pyd
 .DS_Store
 .env
-vector_store/*_tmp/
 .git
+Dockerfile
+.dockerignore
