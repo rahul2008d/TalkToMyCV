@@ -1,6 +1,7 @@
 # TalkToMyCV - FastAPI Backend with RAG
 
 **Copyright (c) Rahul Datta**
+[Click here to visit](https://portfolio.funcodingwithrahul.com/ai-document-query)
 
 A powerful **API service** designed to process and analyze CVs (in PDF format) and provide intelligent responses to user queries. This API utilizes **Retrieval-Augmented Generation (RAG)** with **LangChain** and **FAISS** for efficient document retrieval and intelligent question answering.
 
